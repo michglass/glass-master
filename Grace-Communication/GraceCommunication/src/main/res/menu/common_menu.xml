@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- Family Item !-->
+    <item
+        android:id="@+id/familyItem"
+        android:title="@string/family_menu_item"
+        android:onClick="onOptionsItemSelected"
+        android:icon="@drawable/add_person_icon" />
+
+    <!-- Friends Item !-->
+    <item
+        android:id="@+id/friendsItem"
+        android:title="@string/friends_menu_item"
+        android:onClick="onOptionsItemSelected"
+        android:icon="@drawable/add_person_icon" />
+</menu>

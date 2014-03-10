@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">GestureSimulation</string>
+
+    <string name="gesture_keyword">Gestures</string>
+
+    <string name="menu_item_one">Menu 1</string>
+    <string name="menu_item_two">Menu 2</string>
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.abq.gracecommunication" >
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/add_person_icon"
+        android:label="@string/app_name" >
+        <!-- No Styles for Glass apps, Glass has its own style !-->
+        <activity
+            android:name=".MenuActivity"
+            android:label="@string/app_name" >
+
+            <!-- Voice Trigger references; Triggers needed for immersions !-->
+            <intent-filter>
+                <action android:name="com.google.android.glass.action.VOICE_TRIGGER" />
+            </intent-filter>
+            <meta-data
+                android:name="com.google.android.glass.VoiceTrigger"
+                android:resource="@xml/voice_trigger" />
+        </activity>
+
+        <activity
+            android:name=".FamilyActivity" />
+        <activity
+            android:name=".FriendsActivity" />
+        <activity
+            android:name=".MessagesActivity" />
+    </application>
+
+</manifest>

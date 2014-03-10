@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">GraceCommunication</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Voice Trigger !-->
+    <string name="grace_messages">Grace Comm</string>
+
+    <!-- Menu Items !-->
+    <string name="family_menu_item">Family</string>
+    <string name="friends_menu_item">Friends</string>
+
+</resources>
