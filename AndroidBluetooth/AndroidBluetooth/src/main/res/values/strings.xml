@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Android Bluetooth</string>
+
+    <string name="send_button">OK</string>
+
+    <!-- menu buttons !-->
+    <string name="one_button_menu">One Button Menu</string>
+    <string name="two_button_menu">Two Button Menu</string>
+
+    <!-- two button menu !-->
+    <string name="select_button">OK</string>
+    <string name="back_button">Go Back</string>
+
+</resources>

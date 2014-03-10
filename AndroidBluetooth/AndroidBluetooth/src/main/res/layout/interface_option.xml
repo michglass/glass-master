@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Layout to select between 1 or 2 button activity !-->
+    <!-- one button menu !-->
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/one_button_menu"
+        android:id="@+id/buttonOneButton"
+        android:layout_gravity="center_horizontal"
+        android:onClick="OnButtonClick" />
+    <!-- 2 button menu !-->
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/two_button_menu"
+        android:id="@+id/buttonTwoButton"
+        android:layout_gravity="center_horizontal"
+        android:onClick="OnButtonClick" />
+</LinearLayout>
