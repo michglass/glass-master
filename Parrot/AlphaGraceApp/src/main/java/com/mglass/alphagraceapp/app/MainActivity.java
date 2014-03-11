@@ -22,6 +22,7 @@ import com.google.android.glass.app.Card;
 import com.google.android.glass.app.Card;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
@@ -54,74 +55,154 @@ public class MainActivity extends Activity {
     public static final int COMMAND_OK = 1;
     public static final int COMMAND_BACK = 2;
 
+    MenuBuilder menuBuild = new MenuBuilder();
+    int index =0;
 
+    String msgToSend = "";
+    String contact = "";
+    String menuText = "";
+    int menuImage = -1;
 
+    MenuOption messageOpt = new MenuOption();
+    MenuOption helpOpt = new MenuOption();
+    MenuOption question = new MenuOption();
+    MenuOption friend = new MenuOption();
+    MenuOption family = new MenuOption();
+    MenuOption day = new MenuOption();
+    MenuOption where = new MenuOption();
+    MenuOption homeTime = new MenuOption();
+    MenuOption bathroom = new MenuOption();
+    MenuOption coldTemp = new MenuOption();
+    MenuOption hotTemp = new MenuOption();
+    MenuOption helpMe = new MenuOption();
+    MenuOption dad = new MenuOption();
+    MenuOption mom = new MenuOption();
+    MenuOption friend1 = new MenuOption();
+    MenuOption friend2 = new MenuOption();
+    MenuOption friend3 = new MenuOption();
+    MenuOption message = new MenuOption();
+    MenuOption camera = new MenuOption();
+    MenuOption picture = new MenuOption();
+    MenuOption video = new MenuOption();
+    MenuOption send = new MenuOption();
+    MenuOption redo = new MenuOption();
+    MenuOption delete = new MenuOption();
+
+    ArrayList<MenuOption> questionList = new ArrayList();
+    ArrayList<MenuOption> helpList = new ArrayList();
+    ArrayList<MenuOption> messageList = new ArrayList();
+    ArrayList<MenuOption> relationshipList = new ArrayList();
+    ArrayList<MenuOption> friendList = new ArrayList();
+    ArrayList<MenuOption> familyList = new ArrayList();
+    ArrayList<MenuOption> commandList = new ArrayList();
+    ArrayList<MenuOption> cameraList = new ArrayList();
+    ArrayList<MenuOption> pictureList = new ArrayList();
+    ArrayList<MenuOption> videoList = new ArrayList();
+
+    ArrayList<MenuOption> currentList = commandList;
+    //Create the Menu Options
 
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
             Log.v(TAG, "inside void run()");
-      /* do what you need to do */
-            if(baseMenu){
-                if(mCard.getText() == "Favorite Color"){
-                    mCard.setText("Favorite Animal");
-                }
-                else if(mCard.getText() == "Favorite Animal"){
-                    mCard.setText("Favorite Food");
-                }
-                else{
-                    mCard.setText("Favorite Color");
-                }
-            }
-            else if(colorMenu){
-                if(mCard.getText() == "Pink"){
-                    mCard.setText("Blue");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.blue);
-                }
-                else if(mCard.getText() == "Blue"){
-                    mCard.setText("Purple");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.purple);
-                }
-                else{
-                    mCard.setText("Pink");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.pink);
-                }
-            }
-            else if(animalMenu){
-                if(mCard.getText() == "Puppies"){
-                    mCard.setText("Kitties");
-                    mCard.clearImages();
-                    //mCard.setImageLayout(Card.ImageLayout.FULL);
-                    mCard.addImage(R.drawable.kitten);
-                }
-                else{
-                    mCard.setText("Puppies");
-                    mCard.clearImages();
-                    //mCard.setImageLayout(Card.ImageLayout.FULL);
-                    mCard.addImage(R.drawable.puppy);
-                }
+
+            mCard.clearImages();
+            if(index < currentList.size()){
+
+                menuText = currentList.get(index).displayText;
+//                if(currentList.get(index).image != -1){
+//                    menuImage = currentList.get(index).image;
+//                    mCard.addImage(menuImage);
+//                }
+
+                mCard.setText(menuText);
+
+                Log.v(TAG, currentList.get(index).command);
+                Log.v(TAG,"Current List in Run: " +currentList.get(index).displayText);
+                index++;
             }
             else{
-                if(mCard.getText() == "Ice Cream"){
-                    mCard.setText("Candy");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.candy);
+                index = 0;
+                Log.v(TAG,"Current List in Run: " +currentList.get(index).displayText);
+                menuText = currentList.get(index).displayText;
+                mCard.setText(menuText);
+                Log.v(TAG, currentList.get(index).command);
+                index++;
                 }
-                else if(mCard.getText() == "Candy"){
-                    mCard.setText("Fruit");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.fruits);
-                }
-                else{
-                    mCard.setText("Ice Cream");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.icecream);
-                }
-            }
+
+
+
+      /* do what you need to do */
+//            if(baseMenu){
+//                if(mCard.getText() == "Favorite Color"){
+//                    mCard.setText("Favorite Animal");
+//                }
+//                else if(mCard.getText() == "Favorite Animal"){
+//                    mCard.setText("Favorite Food");
+//                }
+//                else{
+//                    mCard.setText("Favorite Color");
+//                }
+//            }
+//            else if(colorMenu){
+//                if(mCard.getText() == "Pink"){
+//                    mCard.setText("Blue");
+//                    mCard.clearImages();
+//                    mCard.addImage(R.drawable.blue);
+//                }
+//                else if(mCard.getText() == "Blue"){
+//                    mCard.setText("Purple");
+//                    mCard.clearImages();
+//                    mCard.addImage(R.drawable.purple);
+//                    int color;
+//                    color = R.drawable.purple;
+//                    mCard.addImage(color);
+//
+//
+//
+//                }
+//                else{
+//                    mCard.setText("Pink");
+//                    mCard.clearImages();
+//                    mCard.addImage(R.drawable.pink);
+//                }
+//            }
+//            else if(animalMenu){
+//                if(mCard.getText() == "Puppies"){
+//                    mCard.setText("Kitties");
+//                    mCard.clearImages();
+//                    //mCard.setImageLayout(Card.ImageLayout.FULL);
+//                    mCard.addImage(R.drawable.kitten);
+//                }
+//                else{
+//                    mCard.setText("Puppies");
+//                    mCard.clearImages();
+//                    //mCard.setImageLayout(Card.ImageLayout.FULL);
+//                    mCard.addImage(R.drawable.puppy);
+//                }
+//            }
+//            else{
+//                if(mCard.getText() == "Ice Cream"){
+//                    mCard.setText("Candy");
+//                    mCard.clearImages();
+//                    mCard.addImage(R.drawable.candy);
+//                }
+//                else if(mCard.getText() == "Candy"){
+//                    mCard.setText("Fruit");
+//                    mCard.clearImages();
+//                    mCard.addImage(R.drawable.fruits);
+//                }
+//                else{
+//                    mCard.setText("Ice Cream");
+//                    mCard.clearImages();
+//                    mCard.addImage(R.drawable.icecream);
+//                }
+//            }
+
+
             setContentView(mCard.toView());
+
       /* and here comes the "trick" */
             handler.postDelayed(this, 5000);
         }
@@ -145,11 +226,17 @@ public class MainActivity extends Activity {
             Log.v(TAG, "BT not supported");
             finish();
         }
+
+        menuBuild.build(questionList,helpList,messageList, relationshipList,
+                friendList, familyList, commandList, cameraList, pictureList,videoList,
+                helpOpt, question, friend, family, where,day, homeTime, bathroom, coldTemp,
+                hotTemp, helpMe, dad, mom, friend1, friend2, friend3, message,camera, picture,
+                video, send, redo, delete);
+
         runnable.run();
-        mCard.setText("Favorite Color");
+        //mCard.setText("Favorite Color");
         setContentView(mCard.toView());
         mCard.setImageLayout(Card.ImageLayout.FULL);
-        Log.v(TAG, "On Create");
     }
 
     @Override
@@ -231,29 +318,27 @@ public class MainActivity extends Activity {
      * Sets new Text on Card
      * @param msg Message from Android Phone
      */
-    public void updateCard(int msg) {
-
-        //String msgString = String.valueOf(msg);
-        if(mCard.getText() == "Favorite Color"){
-            baseMenu = false;
-            colorMenu = true;
-            animalMenu = false;
-            foodMenu = false;
+    ArrayList<MenuOption> updateCard(int msg, ArrayList<MenuOption> currentList, int index) {
+        ArrayList<MenuOption> temp = new ArrayList();
+        index--;
+        String logInt = "Index: "+ Integer.toString(index);
+        Log.v(TAG, logInt);
+        if(msg == 1){
+            if(currentList.get(index).nextMenu != null){
+                temp = currentList.get(index).nextMenu;
+                currentList = temp;
+                Log.v(TAG,"Current List: " +currentList.get(index).displayText);
+            }
         }
-        else if(mCard.getText() == "Favorite Animal"){
-            baseMenu = false;
-            colorMenu = false;
-            animalMenu = true;
-            foodMenu = false;
-        }
-        else if(mCard.getText() == "Favorite Food"){
-            baseMenu = false;
-            colorMenu = false;
-            animalMenu = false;
-            foodMenu = true;
+        else{
+            if(currentList.get(index).parent != null){
+                currentList = currentList.get(index).parent;
+            }
         }
         //msgCard.setText(msgString);
         //setContentView(msgCard.toView());
+
+        return currentList;
     }
 
     /**
@@ -296,11 +381,11 @@ public class MainActivity extends Activity {
                 //TODO on those commands invoke some kind of simulated Inputs
                 case COMMAND_OK:
                     Log.v(TAG, "Command ok");
-                    updateCard(1);
+                    updateCard(1, currentList, index);
                     break;
                 case COMMAND_BACK:
                     Log.v(TAG, "Command back");
-                    updateCard(2);
+                    updateCard(2, currentList, index);
                     break;
             }
         }
