@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,6 +38,27 @@ public class BluetoothService {
     private AcceptThread mAcceptThread;
     private ConnectedThread mConnectedThread;
 
+    // Variables that indicate the Connection State
+    public static final int STATE_NONE = 0;
+    public static final int STATE_LISTENING = 1;
+    public static final int STATE_CONNECTING = 2;
+    public static final int STATE_CONNECTED = 3;
+
+    // Message Variables
+    public static final int MESSAGE_STATE_CHANGE = 4;
+    public static final int MESSAGE_WRITE = 5;
+    public static final int MESSAGE_RESTART = 6;
+    public static final int WAIT_FOR_CONNECTION = 7;
+    public static final int THIS_STOPPED = 8; // (== ANDROID_STOPPED on Glass)
+
+    // Messages from/to Glass
+    public static final int GLASS_STOPPED = 9; // (== THIS_STOPPED on Glass)
+    public static final int GLASS_OK = 10;
+    public static final int GLASS_BACK = 11;
+
+    // Specific Message for Glass
+
+
     /**
      * Constructor
      * Set up BTAdapter
@@ -46,6 +68,7 @@ public class BluetoothService {
     public BluetoothService(Handler handler) {
         Log.v(TAG, "BT Service Constructor Android");
         this.mbtAdapter = BluetoothAdapter.getDefaultAdapter();
+
         // check if there is BT capacity, should be on Glass,Android
         if(mbtAdapter == null) {
             Log.e(TAG, "Device doesn't support Bluetooth");
@@ -54,7 +77,7 @@ public class BluetoothService {
         mHandler = handler;
 
         // set message to nothings
-        setState(BluetoothMethods.STATE_NONE);
+        setState(STATE_NONE);
     }
 
 
@@ -83,7 +106,7 @@ public class BluetoothService {
         mAcceptThread.start();
 
         // if connection was successful update state
-        setState(BluetoothMethods.STATE_LISTENING);
+        setState(STATE_LISTENING);
     }
     /**
      * Manage Connection
@@ -105,7 +128,7 @@ public class BluetoothService {
         mConnectedThread.start();
 
         // connection was successful, set state to connected
-        setState(BluetoothMethods.STATE_CONNECTED);
+        setState(STATE_CONNECTED);
     }
     /**
      * Disconnect
@@ -126,18 +149,33 @@ public class BluetoothService {
         }
 
         // connection state none
-        setState(BluetoothMethods.STATE_NONE);
+        setState(STATE_NONE);
     }
     /**
      * Restart
      * If writing to Glass fails (Glass app shut down) restart in listening mode
      */
     public void restart() {
+        Log.v(TAG, "Restart Connection");
         // cancel all running threads
         this.disconnect();
 
         // try listening again
         this.start();
+    }
+    /**
+     * Send To Glass
+     * Gets a Command (int) and sends it to Glass
+     * @param command Command to send to Glass
+     */
+    public void sendToGlass(int command) {
+        byte[] msgBytes;
+
+        // convert int to byte array (just 3 bits needed 1 = 001 , 2 = 010)
+        msgBytes = ByteBuffer.allocate(4).putInt(command).array();
+        if(msgBytes == null) Log.v(TAG, "msgBytes NULL");
+        write(msgBytes);
+        Log.v(TAG, "Message: " + command);
     }
     /**
      * Write
@@ -158,10 +196,9 @@ public class BluetoothService {
             mConnectedThread.write(out, mHandler);
         else {
             Message msg = new Message();
-            msg.what = MainActivity.WAIT_FOR_CONNECTION;
+            msg.what = BluetoothService.WAIT_FOR_CONNECTION;
             mHandler.sendMessage(msg);
         }
-
     }
 
 
@@ -171,6 +208,14 @@ public class BluetoothService {
      * Set State
      */
 
+    /**
+     * Adapter Enabled
+     * Checks if the BT Adapter is enabled
+     * @return True if Adapter is enabled, false otherwise
+     */
+    public boolean AdapterEnabled() {
+        return this.mbtAdapter.isEnabled();
+    }
     /**
      * Query Devices
      * Find Glass
@@ -213,7 +258,7 @@ public class BluetoothService {
 
         // send Message to UI to indicate State Change
         Message msg = new Message();
-        msg.what = BluetoothMethods.MESSAGE_STATE_CHANGE;
+        msg.what = MESSAGE_STATE_CHANGE;
         msg.arg1 = toState;
         mHandler.sendMessage(msg);
     }
@@ -302,7 +347,7 @@ public class BluetoothService {
                     break;
                 }
             }
-            Log.v(TAG, "Run Return Success");
+            Log.v(TAG, "Run Return");
         }
         /**
          * Cancel

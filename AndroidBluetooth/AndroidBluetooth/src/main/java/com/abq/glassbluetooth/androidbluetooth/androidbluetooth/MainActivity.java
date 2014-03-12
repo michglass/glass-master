@@ -11,15 +11,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.nio.ByteBuffer;
-
 public class MainActivity extends Activity {
 
     // Debug
     private static final String TAG = "Main Activity Android";
 
     // Bluetooth Vars
-    private BluetoothAdapter mbtAdapter;
     private BluetoothService mbtService;
     private Handler mHandler;
 
@@ -30,24 +27,8 @@ public class MainActivity extends Activity {
     // Button for one button menu (short click = select, long click = go back)
     Button mSelectButton;
 
-    // message for glass
-    private int msgToGlass;
-    private byte[] msgBytes;
-
     // indicates connection
     public static boolean CONNECTED = false;
-    public static final int WAIT_FOR_CONNECTION = 11;
-
-    // Message from Glass to indicate that it has stopped running the BT connection
-    public static final int GLASS_STOPPED = 9;
-
-    // Commands that get send to Glass
-    private static final int GLASS_OK = 1;
-    private static final int GLASS_BACK = 2;
-    private static final int THIS_STOPPED = 5; // tell glass that this application has stopped
-
-    // message from connected thread to restart listening
-    public static final int MESSAGE_RESTART = 10;
 
     // Request to enable BT
     private static final int REQUEST_ENABLE_BT = 1;
@@ -69,19 +50,15 @@ public class MainActivity extends Activity {
 
         Log.v(TAG, "On Create");
 
-        // set message handler
+        //TODO Set Handler
         mHandler = setHandler();
 
         // set up the option buttons
         mOneButtonMenu = (Button) findViewById(R.id.buttonOneButton);
         mTwoButtonMenu = (Button) findViewById(R.id.buttonTwoButton);
 
-        // set the device adapter
-        this.mbtAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(mbtAdapter == null) {
-            Log.v(TAG, "BT not supported");
-            finish();
-        }
+        //TODO Create new BluetoothService
+        mbtService = new BluetoothService(mHandler);
     }
     /**
      * On Start
@@ -93,15 +70,15 @@ public class MainActivity extends Activity {
         Log.v(TAG, "On Start");
         super.onStart();
 
+        //TODO See if Adapter is enabled and query devices
         // Request enabling Bluetooth and query paired devices if it is on
-        if(!mbtAdapter.isEnabled()) {
+        if(!mbtService.AdapterEnabled()) {
             // Should always be enabled on Glass!
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
             Log.v(TAG, "Bluetooth already enabled"); // usually on Glass
             // find device Glass should be paired to
-            mbtService = new BluetoothService(mHandler);
             mbtService.queryDevices();
         }
     }
@@ -116,6 +93,7 @@ public class MainActivity extends Activity {
         Log.v(TAG,"On Resume");
         super.onResume();
 
+        //TODO Start Listening to incoming requests
         // start the accept thread to listen to incoming connection requests
         mbtService.start();
     }
@@ -126,7 +104,8 @@ public class MainActivity extends Activity {
     public void onStop() {
         Log.v(TAG, "On Stop");
 
-        sendToGlass(THIS_STOPPED); // tell Glass that this application has stopped
+        //TODO Let Glass know that this application has stopped
+        mbtService.sendToGlass(BluetoothService.THIS_STOPPED); // tell Glass that this application has stopped
         super.onStop();
     }
     /**
@@ -139,9 +118,9 @@ public class MainActivity extends Activity {
         Log.v(TAG, "On Destroy");
         super.onDestroy();
 
+        //TODO Disconnect BT
         // close threads and sockets
         mbtService.disconnect();
-        //TODO disconnect in onStop, maybe
     }
 
 
@@ -162,8 +141,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 // on short click OK gets send
-                msgToGlass = GLASS_OK;
-                sendToGlass(msgToGlass);
+                mbtService.sendToGlass(BluetoothService.GLASS_OK);
             }
         });
 
@@ -172,26 +150,13 @@ public class MainActivity extends Activity {
             @Override
             public boolean onLongClick(View view) {
                 // on long click Back gets send
-                msgToGlass = GLASS_BACK;
-                sendToGlass(msgToGlass);
+                mbtService.sendToGlass(BluetoothService.GLASS_BACK);
                 return true;
             }
         });
     }
-    /**
-     * Send to Glass
-     * Send command via BT to Glass
-     * @param command Command that is being send to Glass
-     */
-    public void sendToGlass(int command) {
-        msgToGlass = command;
 
-        // convert int to byte array (just 3 bits needed 1 = 001 , 2 = 010)
-        msgBytes = ByteBuffer.allocate(4).putInt(msgToGlass).array();
-        if(msgBytes == null) Log.v(TAG, "msgBytes NULL");
-        mbtService.write(msgBytes);
-        Log.v(TAG, "Message: " + msgToGlass);
-    }
+    //TODO Create Handler for Messages from Glass
     /**
      * Set Handler
      * @return Handler that gets messages from BTService and ConnectedThread
@@ -206,42 +171,42 @@ public class MainActivity extends Activity {
                 switch(msg.what) {
 
                     // connection state changed
-                    case BluetoothMethods.MESSAGE_STATE_CHANGE:
+                    case BluetoothService.MESSAGE_STATE_CHANGE:
                         Toast.makeText(getApplicationContext(),
                                 "Connection state changed", Toast.LENGTH_SHORT).show();
                         switch (msg.arg1) {
-                            case BluetoothMethods.STATE_CONNECTED:
+                            case BluetoothService.STATE_CONNECTED:
                                 Toast.makeText(getApplicationContext(),
                                         "Connected", Toast.LENGTH_SHORT).show();
                                 break;
-                            case BluetoothMethods.STATE_CONNECTING:
+                            case BluetoothService.STATE_CONNECTING:
                                 Toast.makeText(getApplicationContext(),
                                         "Connecting", Toast.LENGTH_SHORT).show();
                                 break;
-                            case BluetoothMethods.STATE_LISTENING:
+                            case BluetoothService.STATE_LISTENING:
                                 Toast.makeText(getApplicationContext(),
                                         "Listening", Toast.LENGTH_SHORT).show();
                                 break;
-                            case BluetoothMethods.STATE_NONE:
+                            case BluetoothService.STATE_NONE:
                                 Toast.makeText(getApplicationContext(),
                                         "Doing Nothing", Toast.LENGTH_SHORT).show();
                                 break;
                         }
                         break;
-                    case BluetoothMethods.MESSAGE_WRITE:
+                    case BluetoothService.MESSAGE_WRITE:
                         Toast.makeText(getApplicationContext(),
                                 "Write to OutStream", Toast.LENGTH_SHORT).show();
                         break;
-                    case MESSAGE_RESTART:
+                    case BluetoothService.MESSAGE_RESTART:
                         Toast.makeText(getApplicationContext(),
                                 "Restart Listening", Toast.LENGTH_SHORT).show();
                         mbtService.restart();
                         break;
-                    case WAIT_FOR_CONNECTION:
+                    case BluetoothService.WAIT_FOR_CONNECTION:
                         Toast.makeText(getApplicationContext(),
                                 "Wait for Connection", Toast.LENGTH_SHORT).show();
                         break;
-                    case GLASS_STOPPED:
+                    case BluetoothService.GLASS_STOPPED:
                         Toast.makeText(getApplicationContext(),
                                 "Restart Listening", Toast.LENGTH_SHORT).show();
                         mbtService.restart();
@@ -273,11 +238,11 @@ public class MainActivity extends Activity {
                 break;
             case R.id.buttonSelect: // two button menu
                 Log.v(TAG, "2 Buttons OK");
-                sendToGlass(GLASS_OK);
+                mbtService.sendToGlass(BluetoothService.GLASS_OK);
                 break;
             case R.id.buttonBack:
                 Log.v(TAG, "2 Buttons Back");
-                sendToGlass(GLASS_BACK);
+                mbtService.sendToGlass(BluetoothService.GLASS_BACK);
                 break;
         }
     }

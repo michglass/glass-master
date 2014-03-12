@@ -105,14 +105,14 @@ public class ConnectedThread extends Thread {
 
             // send message to Main Activity
             Message msg = new Message();
-            msg.what = BluetoothMethods.MESSAGE_WRITE;
+            msg.what = BluetoothService.MESSAGE_WRITE;
             handler.sendMessage(msg);
         } catch (IOException ioE) {
             Log.e(TAG, "Write Failed", ioE);
 
             // send message to main activity to restart listening
             Message restart = new Message();
-            restart.what = MainActivity.MESSAGE_RESTART;
+            restart.what = BluetoothService.MESSAGE_RESTART;
             handler.sendMessage(restart);
         }
     }
