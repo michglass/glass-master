@@ -23,7 +23,10 @@ public class BluetoothService {
     // Bluetooth Vars
     private final BluetoothAdapter mbtAdapter;
     private BluetoothDevice mbtDevice;
-    private static final String DEVICE_NAME = "Cone"; // Name of Danny's phone
+    private static final String DEVICE_NAME = "Galaxy NexusCDMA 2";
+    // "Cone" = Danny
+    // "SCH-I545" = Tim
+    // "Galaxy NexusCDMA 2" = Oliver
     private int mCurrState;
 
     // Thread that initiates the connection and Thread that manages connection
@@ -38,6 +41,16 @@ public class BluetoothService {
     public static final int STATE_NONE = 0; // doing nothing
     public static final int STATE_CONNECTING = 1; // connecting
     public static final int STATE_CONNECTED = 2; // connected
+    // Messages for Main Activity
+    public static final int MESSAGE_STATE_CHANGE = 3; // indicates connection state change (debug)
+    public static final int MESSAGE_INCOMING = 4; // message with string content (only for debug)
+    public static final int MESSAGE_CONNECTION_FAILED = 5;
+    // Indicates that Android has stopped
+    public static final int ANDROID_STOPPED = 8; //( == THIS_STOPPED on Android) indicates if the android app is still running
+    public static final int THIS_STOPPED = 9; // (== GLASS_STOPPED on Android) indicates if this app has stopped
+    // Commands for Glass
+    public static final int COMMAND_OK = 10;
+    public static final int COMMAND_BACK = 11;
 
     // Extra is the key for the string message that gets put into the bundle
     // the bundle is send to the activity which can get the string message with this key
@@ -153,7 +166,23 @@ public class BluetoothService {
         }
 
         // all threads stopped, set state to none and send message to UI
-        setState(STATE_NONE);
+        if(mCurrState != BluetoothService.STATE_NONE)
+            setState(STATE_NONE);
+    }
+    /**
+     * Write
+     * Sends a message to Android device
+     * @param msg Message for Android device
+     */
+    public void write(int msg) {
+
+        if(mCurrState != BluetoothService.STATE_NONE) {
+            if (mConnectedThread != null)
+                mConnectedThread.write(msg);
+            else {
+                Log.v(TAG, "Connection not yet established");
+            }
+        }
     }
 
 
@@ -161,6 +190,14 @@ public class BluetoothService {
      * Util Methods
      */
 
+    /**
+     * Adapter Enabled
+     * Checks if the BT Adapter is enabled
+     * @return True if Adapter is enabled, false otherwise
+     */
+    public boolean AdapterEnabled() {
+        return this.mbtAdapter.isEnabled();
+    }
     /**
      * Set state
      * Set the new connection state
@@ -173,7 +210,7 @@ public class BluetoothService {
 
         // send message to Main Activity
         Message msg = new Message();
-        msg.what = MainActivity.MESSAGE_STATE_CHANGE;
+        msg.what = BluetoothService.MESSAGE_STATE_CHANGE;
         msg.arg1 = toState;
     }
     /**
@@ -182,7 +219,7 @@ public class BluetoothService {
      * Assign Danny's (later Grace's) phone to the member device
      */
     public void queryDevices() {
-        Log.v(TAG, "Query devices");
+        Log.v(TAG, "query devices");
         // get all paired devices
         Set<BluetoothDevice> pairedDevices = mbtAdapter.getBondedDevices();
         Log.v(TAG, mbtAdapter.getName());
@@ -194,8 +231,8 @@ public class BluetoothService {
                     // if device is found save it in member var
                     if(btDevice.getName().equals(DEVICE_NAME)) {
                         mbtDevice = btDevice;
-                        Log.v(TAG, "Device Name: "+ mbtDevice.getName());
                     }
+                    Log.v(TAG, "Device Name: "+ mbtDevice.getName());
                 }
             } else {
                 Log.v(TAG, "No devices found");
@@ -256,7 +293,13 @@ public class BluetoothService {
                 // unable to connect, try closing socket
                 try {
                     Log.v(TAG, "Unable to connect");
+
+                    // send message to activity
+                    Message msg = new Message();
+                    msg.what = BluetoothService.MESSAGE_CONNECTION_FAILED;
+                    mMainHandler.sendMessage(msg);
                     mmBtSocket.close();
+
                 } catch(IOException closeException) {
                     Log.e(TAG, "Closing Socket Failed", closeException);
                 }

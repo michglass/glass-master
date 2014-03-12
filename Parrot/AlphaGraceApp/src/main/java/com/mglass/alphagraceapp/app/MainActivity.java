@@ -1,14 +1,12 @@
 package com.mglass.alphagraceapp.app;
 
 /**
- * Created by vbganesh on 2/26/14.
+ * Created by Oliver Breit
+ * Date: 2/26/14
  */
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,27 +15,12 @@ import android.view.WindowManager;
 
 import com.google.android.glass.app.Card;
 
-
-
-import com.google.android.glass.app.Card;
-
-import java.io.File;
-
 public class MainActivity extends Activity {
-
-    private Card mCard = new Card(this);
-    private boolean baseMenu = true;
-    private boolean colorMenu = false;
-    private boolean animalMenu = false;
-    private boolean foodMenu = false;
-    private Handler handler = new Handler();
-
 
     // Debug
     private static final String TAG = "Main Activity";
 
     // Bluetooth Vars
-    private BluetoothAdapter mbtAdapter;
     private BluetoothService mbtService;
 
     // Card that displays message from android phone
@@ -46,124 +29,25 @@ public class MainActivity extends Activity {
     // Request Variables
     private static final int REQUEST_ENABLE_BT = 1;
 
-    // messages from BT service
-    public static final int MESSAGE_STATE_CHANGE = 3; // indicates connection state change (debug)
-    public static final int MESSAGE_INCOMING = 4; // message with string content (only for debug)
-
-    // messages that indicate commands (Tap = select, Right, Left, Down = back)
-    public static final int COMMAND_OK = 1;
-    public static final int COMMAND_BACK = 2;
-
-
-
-
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            Log.v(TAG, "inside void run()");
-      /* do what you need to do */
-            if(baseMenu){
-                if(mCard.getText() == "Favorite Color"){
-                    mCard.setText("Favorite Animal");
-                }
-                else if(mCard.getText() == "Favorite Animal"){
-                    mCard.setText("Favorite Food");
-                }
-                else{
-                    mCard.setText("Favorite Color");
-                }
-            }
-            else if(colorMenu){
-                if(mCard.getText() == "Pink"){
-                    mCard.setText("Blue");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.blue);
-                }
-                else if(mCard.getText() == "Blue"){
-                    mCard.setText("Purple");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.purple);
-                }
-                else{
-                    mCard.setText("Pink");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.pink);
-                }
-            }
-            else if(animalMenu){
-                if(mCard.getText() == "Puppies"){
-                    mCard.setText("Kitties");
-                    mCard.clearImages();
-                    //mCard.setImageLayout(Card.ImageLayout.FULL);
-                    mCard.addImage(R.drawable.kitten);
-                }
-                else{
-                    mCard.setText("Puppies");
-                    mCard.clearImages();
-                    //mCard.setImageLayout(Card.ImageLayout.FULL);
-                    mCard.addImage(R.drawable.puppy);
-                }
-            }
-            else{
-                if(mCard.getText() == "Ice Cream"){
-                    mCard.setText("Candy");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.candy);
-                }
-                else if(mCard.getText() == "Candy"){
-                    mCard.setText("Fruit");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.fruits);
-                }
-                else{
-                    mCard.setText("Ice Cream");
-                    mCard.clearImages();
-                    mCard.addImage(R.drawable.icecream);
-                }
-            }
-            setContentView(mCard.toView());
-      /* and here comes the "trick" */
-            handler.postDelayed(this, 5000);
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "On Create");
 
         super.onCreate(savedInstanceState);
 
+        //TODO keep screen from dimming
         // keep screen from dimming
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         msgCard = new Card(this);
-        msgCard.setText("Messages get displayed here");
+        msgCard.setText("Badadum");
         setContentView(msgCard.toView());
 
-        this.mbtAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(mbtAdapter == null) {
-            Log.v(TAG, "BT not supported");
-            finish();
-        }
-        runnable.run();
-        mCard.setText("Favorite Color");
-        setContentView(mCard.toView());
-        mCard.setImageLayout(Card.ImageLayout.FULL);
+        //TODO Set up Bluetooth Service
+        mbtService = new BluetoothService(mHandler); // set up bluetooth service
+
         Log.v(TAG, "On Create");
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.v(TAG, "On Destroy");
-
-        if(mbtService != null) {
-            mbtService.stopThreads();
-        }
-    }
-
-
-//From GlassBluetooth
 
 
     @Override
@@ -171,18 +55,17 @@ public class MainActivity extends Activity {
         super.onStart();
         Log.v(TAG, "On Start");
 
-        msgCard.setText("Welcome to Grace's Glasses");
         setContentView(msgCard.toView());
 
+        //TODO See if Adapter is enabled and query devices
         // Request enabling Bluetooth, if it's not on
-        if(!mbtAdapter.isEnabled()) {
+        if(!mbtService.AdapterEnabled()) {
             // Should always be enabled on Glass!
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
             Log.v(TAG, "Bluetooth already enabled"); // usually on Glass
             // find device Glass should be paired to
-            mbtService = new BluetoothService(mHandler); // set up bluetooth service
             mbtService.queryDevices();
         }
     }
@@ -194,6 +77,8 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         Log.v(TAG, "On Resume");
+
+        //TODO Connect to Android
         // Starting connection with mbtService
         // if successful ConnectedThread will start
         // (called from within ConnectThread.run) that manages the connection
@@ -215,11 +100,26 @@ public class MainActivity extends Activity {
         Log.v(TAG, "On Stop");
         super.onStop();
 
+        //TODO Disconnect from Android
         // activity not longer visible
         // stop all threads which also close the sockets
         if(mbtService != null) {
+            mbtService.write(BluetoothService.THIS_STOPPED);
             mbtService.stopThreads();
         }
+    }
+    /**
+     * On Destroy
+     * Close the sockets
+     * Stop the Threads
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.v(TAG, "On Destroy");
+
+        //TODO Disconnect Bluetooth from Android
+        mbtService.stopThreads();
     }
 
     /**
@@ -232,30 +132,12 @@ public class MainActivity extends Activity {
      * @param msg Message from Android Phone
      */
     public void updateCard(int msg) {
-
-        //String msgString = String.valueOf(msg);
-        if(mCard.getText() == "Favorite Color"){
-            baseMenu = false;
-            colorMenu = true;
-            animalMenu = false;
-            foodMenu = false;
-        }
-        else if(mCard.getText() == "Favorite Animal"){
-            baseMenu = false;
-            colorMenu = false;
-            animalMenu = true;
-            foodMenu = false;
-        }
-        else if(mCard.getText() == "Favorite Food"){
-            baseMenu = false;
-            colorMenu = false;
-            animalMenu = false;
-            foodMenu = true;
-        }
-        //msgCard.setText(msgString);
-        //setContentView(msgCard.toView());
+        String s = String.valueOf(msg);
+        msgCard.setText(s);
+        setContentView(msgCard.toView());
     }
 
+    //TODO Handler for Messages from Android/BT Service
     /**
      * Message Handler
      * Receive Messages from BluetoothService about connection state
@@ -269,7 +151,7 @@ public class MainActivity extends Activity {
         public void handleMessage(Message msg) {
 
             switch (msg.what) {
-                case MESSAGE_STATE_CHANGE:
+                case BluetoothService.MESSAGE_STATE_CHANGE:
                     Log.v(TAG, "connection state changed");
                     switch (msg.arg1) {
                         case BluetoothService.STATE_CONNECTED:
@@ -284,7 +166,7 @@ public class MainActivity extends Activity {
                     }
                     break;
                 // in case this activity received a string message from phone
-                case MESSAGE_INCOMING:
+                case BluetoothService.MESSAGE_INCOMING:
                     Log.v(TAG, "message income");
                     // display message on the card, null check is performed
                     // before message gets send --> shouldn't be null
@@ -294,13 +176,23 @@ public class MainActivity extends Activity {
                     break;
                 // user commands that manipulate glass timeline
                 //TODO on those commands invoke some kind of simulated Inputs
-                case COMMAND_OK:
+                case BluetoothService.COMMAND_OK:
                     Log.v(TAG, "Command ok");
-                    updateCard(1);
+                    updateCard(BluetoothService.COMMAND_OK);
                     break;
-                case COMMAND_BACK:
+                case BluetoothService.COMMAND_BACK:
                     Log.v(TAG, "Command back");
-                    updateCard(2);
+                    updateCard(BluetoothService.COMMAND_BACK);
+                    break;
+                case BluetoothService.ANDROID_STOPPED:
+                    Log.v(TAG, "Android App closed");
+                    mbtService.setState(BluetoothService.STATE_NONE);
+                    finish(); // close this application if Android application is down
+                    break;
+                case BluetoothService.MESSAGE_CONNECTION_FAILED:
+                    Log.v(TAG, "Failed Conn App Closing");
+                    mbtService.setState(BluetoothService.STATE_NONE);
+                    finish();
                     break;
             }
         }

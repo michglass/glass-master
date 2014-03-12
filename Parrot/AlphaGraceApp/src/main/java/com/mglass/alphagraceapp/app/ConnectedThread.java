@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 /**
@@ -25,6 +26,7 @@ public class ConnectedThread extends Thread {
     // Socket and Input Stream
     private final BluetoothSocket mmBTSocket;
     private final InputStream mmInStream;
+    private final OutputStream mmOutStream;
 
     /**
      * Constructor
@@ -38,6 +40,7 @@ public class ConnectedThread extends Thread {
         // set up socket and Instream
         mmBTSocket = btSocket;
         InputStream tempIn = null;
+        OutputStream tempOut = null;
 
         // set up handler
         mHandler = handler;
@@ -45,12 +48,14 @@ public class ConnectedThread extends Thread {
         try {
             Log.v(TAG, "Try getting I/O Streams");
             tempIn = btSocket.getInputStream();
+            tempOut = btSocket.getOutputStream();
         } catch (IOException ioE) {
             Log.e(TAG, "Failed getting I/O Streams", ioE);
         }
 
         // success getting I/O streams
         mmInStream = tempIn;
+        mmOutStream = tempOut;
     }
     /**
      * Run
@@ -86,6 +91,21 @@ public class ConnectedThread extends Thread {
         Log.v(TAG, "Run Return");
     }
     /**
+     * Write
+     * Write a message to Output Stream and send it to Android Device
+     * @param msg Message that gets send to Android
+     */
+    public void write(int msg) {
+        Log.v(TAG, "Write Out");
+        byte[] buffer = ByteBuffer.allocate(4).putInt(msg).array();
+
+        try {
+            mmOutStream.write(buffer);
+        } catch (IOException e) {
+            Log.e(TAG, "Failed writing to Android", e);
+        }
+    }
+    /**
      * Cancel
      * Close the socket
      */
@@ -118,7 +138,7 @@ public class ConnectedThread extends Thread {
     public void sendStringMessage(String stringMsg){
 
         Message msg = new Message();
-        msg.what = MainActivity.MESSAGE_INCOMING;
+        msg.what = BluetoothService.MESSAGE_INCOMING;
         Bundle data = new Bundle();
         data.putString(BluetoothService.EXTRA_MESSAGE, stringMsg);
         msg.setData(data);
