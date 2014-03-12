@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Android-Input/Grace-Communication/GraceCommunication/src/main/main.iml" filepath="$PROJECT_DIR$/Android-Input/Grace-Communication/GraceCommunication/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Grace-Communication/GraceCommunication/src/main/main1.iml" filepath="$PROJECT_DIR$/Grace-Communication/GraceCommunication/src/main/main1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Parrot/AlphaGraceApp/src/main/main2.iml" filepath="$PROJECT_DIR$/Parrot/AlphaGraceApp/src/main/main2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GestureSimulation/GestureSimulation/src/main/main3.iml" filepath="$PROJECT_DIR$/GestureSimulation/GestureSimulation/src/main/main3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AndroidBluetooth/AndroidBluetooth/src/main/main4.iml" filepath="$PROJECT_DIR$/AndroidBluetooth/AndroidBluetooth/src/main/main4.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Android-Input/Android-Input/src/main/main5.iml" filepath="$PROJECT_DIR$/Android-Input/Android-Input/src/main/main5.iml" />
+    </modules>
+  </component>
+</project>
+
