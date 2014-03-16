@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ServiceTest</string>
+
+    <!-- Strings for Main Activity !-->
+    <string name="send_ok_glass">Send OK to Glass</string>
+    <string name="send_back_glass">Send Back to Glass</string>
+    <string name="start_sub_activity">Start Sub Activity</string>
+</resources>
