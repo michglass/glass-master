@@ -1,0 +1,31 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Layout to select between 1 or 2 button activity !-->
+    <!-- one button menu !-->
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/send_ok_glass"
+        android:id="@+id/sendOkMain"
+        android:layout_gravity="center_horizontal"
+        android:onClick="OnButtonClick" />
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/send_back_glass"
+        android:id="@+id/sendBackMain"
+        android:layout_gravity="center_horizontal"
+        android:onClick="OnButtonClick" />
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/start_sub_activity"
+        android:id="@+id/startSubActivity"
+        android:layout_gravity="center_horizontal"
+        android:onClick="OnButtonClick" />
+</LinearLayout><!-- From: file:/C:/Users/Oliver/AndroidStudioProjects/ServiceTest/ServiceTest/src/main/res/layout/activity_main.xml -->
