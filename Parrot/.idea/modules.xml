@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Parrot.iml" filepath="$PROJECT_DIR$/Parrot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AlphaGraceApp/AlphaGraceApp.iml" filepath="$PROJECT_DIR$/AlphaGraceApp/AlphaGraceApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Grace.iml" filepath="$PROJECT_DIR$/Grace.iml" />
     </modules>
   </component>
 </project>

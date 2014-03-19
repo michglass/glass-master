@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.graphics.Picture;
 import android.os.Bundle;
 import android.os.Handler;
@@ -103,7 +104,7 @@ public class MainActivity extends Activity {
 
         //TODO Unbind Service
         if(mBound) {
-            sendMessageToService(BluetoothService.UNREGISTER_CLIENT);
+            sendMessageToService(BluetoothService.INT_MESSAGE, BluetoothService.UNREGISTER_CLIENT);
             unbindService(mConnection);
             mBound = false;
         }
@@ -171,9 +172,23 @@ public class MainActivity extends Activity {
      * Send Message To Service
      * Sends a message regarding the connection status
      */
-    public void sendMessageToService(int message) {
+    public void sendMessageToService(int messageType, Object message) {
         Message msg = new Message();
-        msg.what = message;
+
+        switch (messageType) {
+            case BluetoothService.INT_MESSAGE:
+                int intMsg = (Integer) message;
+                msg.what = intMsg;
+                break;
+            case BluetoothService.TEXT_MESSAGE:
+                msg.what = BluetoothService.TEXT_MESSAGE;
+                msg.obj = message;
+                break;
+            case BluetoothService.PICTURE_MESSAGE:
+                msg.what = BluetoothService.PICTURE_MESSAGE;
+                msg.obj = message;
+                break;
+        }
 
         try {
             Log.v(TAG, "Try contacting Service");
@@ -181,22 +196,6 @@ public class MainActivity extends Activity {
         } catch (RemoteException remE) {
             Log.e(TAG, "Couldn't contact Service", remE);
         }
-    }
-    //TODO Send Text Msg to Service
-    /**
-     * Send a Text Message to the Service
-     * @param textMessage String message
-     */
-    public void sendTextToService(String textMessage) {
-
-    }
-    //TODO Send a Picture to Service
-    /**
-     * Send a picture to the service
-     * @param pic Picture param
-     */
-    public void sendPictureToService(Picture pic) {
-
     }
     //TODO First message upon establishing binding to service
     /**
@@ -275,7 +274,8 @@ public class MainActivity extends Activity {
     public boolean onKeyDown(int keycode, KeyEvent event) {
 
         if(keycode == KeyEvent.KEYCODE_DPAD_CENTER) {
-            startActivity(new Intent(this, SubActivity.class));
+            //startActivity(new Intent(this, SubActivity.class));
+            sendMessageToService(BluetoothService.TEXT_MESSAGE, "HeyHey");
             return true;
         }
         return super.onKeyDown(keycode, event);
