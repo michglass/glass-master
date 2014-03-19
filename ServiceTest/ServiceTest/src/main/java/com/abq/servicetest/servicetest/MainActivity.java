@@ -13,6 +13,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 
@@ -28,28 +30,20 @@ public class MainActivity extends Activity {
     // Debug
     private static final String TAG = "Main Activity";
 
-    /**
-     * Service Stuff
-     */
-    // Messenger for sending messages to service
+    //TODO Service Variables
     private Messenger mBluetoothServiceMessenger;
-
-    /**
-     * Service Stuff
-     */
-    // boolean indicating if client is connected to service
     private boolean mBound;
-
-    /**
-     * Service Stuff
-     */
-    // Messenger that gets published to Service
     private final Messenger clientMessenger = new Messenger(new ServiceHandler());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "On Create");
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_main);
 
         /**
@@ -223,6 +217,14 @@ public class MainActivity extends Activity {
                             "Restart Listening", Toast.LENGTH_SHORT).show();
                     // send message to service that it has to restart the connection
                     sendMessageToService(BluetoothService.MESSAGE_RESTART);
+                    break;
+                case BluetoothService.STRING_MESSAGE:
+                    String s = (String) msg.obj;
+                    Toast.makeText(getApplicationContext(),
+                            "String Msg: " + s, Toast.LENGTH_SHORT).show();
+                    break;
+                case BluetoothService.BITMAP_MESSAGE:
+                    Log.v(TAG, "Bitmap Message");
                     break;
             }
         }

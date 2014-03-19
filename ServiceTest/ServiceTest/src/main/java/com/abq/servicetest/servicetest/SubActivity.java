@@ -24,17 +24,15 @@ public class SubActivity extends Activity {
     // Debug
     public static final String TAG = "Sub Activity";
 
-    /**
-     * Service Stuff
-     */
+    //TODO Service Variables
     private Messenger mBluetoothServiceMessenger;
     private boolean mBound;
-
-    /**
-     * Service Stuff
-     */
     private Messenger clientMessenger = new Messenger(new ServiceHandler());
 
+    /**
+     * On Create
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "On Create");

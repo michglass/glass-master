@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.io.IOException;
@@ -61,6 +62,11 @@ public class BluetoothService extends Service {
     public static final int GLASS_STOPPED = 9; // (== THIS_STOPPED on Glass)
     public static final int GLASS_OK = 10;
     public static final int GLASS_BACK = 11;
+
+    // Special Messages
+    public static final int INT_MESSAGE = 1;
+    public static final int STRING_MESSAGE = 2;
+    public static final int BITMAP_MESSAGE = 3;
 
     // indicates if Bluetooth connection is still going
     public static boolean CONNECTED = false;
@@ -203,11 +209,25 @@ public class BluetoothService extends Service {
     /**
      * Send Message To Client
      * Sends a message to a bound Client
-     * @param clientMsg Message for the Client
+     * @param message Message for the Client
      */
-    private void sendMessageToClient(int clientMsg) {
+    private void sendMessageToClient(int messageType, Object message) {
         Message msg = new Message();
-        msg.what = clientMsg;
+
+        switch (messageType) {
+            case INT_MESSAGE:
+                int intMsg = (Integer) message;
+                msg.what = intMsg;
+                break;
+            case STRING_MESSAGE:
+                msg.what = STRING_MESSAGE;
+                msg.obj =  message;
+                break;
+            case BITMAP_MESSAGE:
+                msg.what = BITMAP_MESSAGE;
+                msg.obj = message;
+                break;
+        }
 
         try {
             mClientMessenger.send(msg);
@@ -331,7 +351,7 @@ public class BluetoothService extends Service {
         if(mConnectedThread != null) // if trying to write out when still listening
             mConnectedThread.write(out);
         else {
-            sendMessageToClient(BluetoothService.WAIT_FOR_CONNECTION);
+            sendMessageToClient(INT_MESSAGE, BluetoothService.WAIT_FOR_CONNECTION);
         }
     }
 
@@ -554,12 +574,17 @@ public class BluetoothService extends Service {
 
                     // convert bytes to int
                     ByteBuffer wrapper = ByteBuffer.wrap(buffer);
-                    int inMessage = wrapper.getInt();
-                    Log.v(TAG, "In Message: " + inMessage);
+                    int intMessage = wrapper.getInt();
+
+                    if (intMessage > 100) { // meaning message is actually a string
+                        String s = new String(buffer, 0, bytes);
+                        Log.v(TAG, "String Message: " + s);
+                        sendMessageToClient(STRING_MESSAGE, s);
+                    }
+                    Log.v(TAG, "Int Message: " + intMessage);
 
                     // Send Message to bound Client
-                    sendMessageToClient(inMessage);
-
+                    sendMessageToClient(INT_MESSAGE, intMessage);
                 } catch (IOException e) {
                     Log.e(TAG, "Failed reading from Glass", e);
                     break;
@@ -576,14 +601,13 @@ public class BluetoothService extends Service {
             Log.v(TAG, "Write out");
             try {
                 mmOutStream.write(bytes);
-
                 // send message to Main Activity
-                sendMessageToClient(BluetoothService.MESSAGE_WRITE);
+                sendMessageToClient(INT_MESSAGE, BluetoothService.MESSAGE_WRITE);
             } catch (IOException ioE) {
                 Log.e(TAG, "Write Failed", ioE);
 
                 // send message to main activity to restart listening
-                sendMessageToClient(BluetoothService.MESSAGE_RESTART);
+                sendMessageToClient(INT_MESSAGE, BluetoothService.MESSAGE_RESTART);
             }
         }
         /**
