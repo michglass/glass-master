@@ -3,6 +3,6 @@
 
     <string name="app_name">GraphicTestGlass</string>
 
-    <string name="animation">Animation</string>
+    <string name="tictactoe">Tic Tac Toe</string>
 
 </resources>
