@@ -12,6 +12,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.SystemClock;
+import android.telephony.SmsManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -29,7 +30,6 @@ public class BluetoothService extends Service {
 
     // Debug
     private final static String TAG = "Bluetooth Service Android";
-
     // Unique UUID of this app (same as UUID on Glass)
     private static final UUID btUUID = UUID.fromString("bfdd94e0-9a5e-11e3-a5e2-0800200c9a66");
 
@@ -70,6 +70,9 @@ public class BluetoothService extends Service {
 
     // indicates if Bluetooth connection is still going
     public static boolean CONNECTED = false;
+
+    //check if card is a contact
+    private boolean contact = false;
 
     // Service Variables
     // Messenger that gets puplished to client
@@ -213,13 +216,19 @@ public class BluetoothService extends Service {
      */
     private void sendMessageToClient(int messageType, Object message) {
         Message msg = new Message();
-
         switch (messageType) {
             case INT_MESSAGE:
                 int intMsg = (Integer) message;
                 msg.what = intMsg;
                 break;
             case STRING_MESSAGE:
+                if(contact){
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage("2404630128", null, message.toString(), null, null);
+                }
+                else if(message.toString() == "Mom" || message.toString() == "dad"){
+
+                }
                 msg.what = STRING_MESSAGE;
                 msg.obj =  message;
                 break;
@@ -560,6 +569,7 @@ public class BluetoothService extends Service {
          * Listen to Glass Input constantly
          * Glass sends message when it shuts down
          */
+
         @Override
         public void run() {
             Log.v(TAG, "Run");

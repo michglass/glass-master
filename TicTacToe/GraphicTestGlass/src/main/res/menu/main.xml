@@ -1,4 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.abq.graphictestglass.graphictestglass.MainActivity" >
+    tools:context="com.abq.graphictestglass.graphictestglass.TicTacToeActivity" >
 </menu>
